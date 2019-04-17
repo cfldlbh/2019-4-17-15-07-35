@@ -12,4 +12,9 @@ public class IndexController {
         model.addAttribute("host","http://baidu.com");
         return "index";
     }
+    @RequestMapping("/index2")
+    public String indexMethod2(Model model){
+        model.addAttribute("host","http://baidu.com");
+        return "index";
+    }
 }
