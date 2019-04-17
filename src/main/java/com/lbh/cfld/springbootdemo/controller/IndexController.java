@@ -12,6 +12,7 @@ public class IndexController {
         model.addAttribute("host","http://baidu.com");
         return "index";
     }
+    /*分支分支分支分支分支*/
     @RequestMapping("/index2")
     public String indexMethod2(Model model){
         model.addAttribute("host","http://baidu.com");
