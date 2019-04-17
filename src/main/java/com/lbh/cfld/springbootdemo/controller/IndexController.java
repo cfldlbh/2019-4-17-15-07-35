@@ -13,7 +13,7 @@ public class IndexController {
         return "index";
     }
 
-    /*分支分支分支分支分支*/
+    /*分支分支分支分支分支 修复bug*/
 
 
     @RequestMapping("/index2")
