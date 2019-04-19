@@ -1,8 +1,10 @@
 package com.lbh.cfld.springbootdemo.model;
 
 
-import java.util.Date;
+import lombok.Data;
 
+import java.util.Date;
+@Data
 public class UserInfo {
     private Long userId;
     private String userName;
