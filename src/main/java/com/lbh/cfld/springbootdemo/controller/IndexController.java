@@ -29,4 +29,8 @@ public class IndexController {
     }
     /*注释分支分支*/
 
+    @RequestMapping("/login")
+    public String login(){
+        return "login";
+    }
 }
