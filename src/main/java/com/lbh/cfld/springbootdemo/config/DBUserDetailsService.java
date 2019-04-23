@@ -23,6 +23,7 @@ public class DBUserDetailsService implements UserDetailsService {
         if(user == null){
             throw new UsernameNotFoundException("用户不存在");
         }
+        //dev 提交撤回
         ArrayList<SimpleGrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("user"));
         return new User(userInfo.getUserName(),userInfo.getUserPassword(),authorities);
