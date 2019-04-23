@@ -16,4 +16,8 @@ public class GlobalExceptionHandler {
         modelAndView.setViewName("error");
         return modelAndView;
     }
+//    @ExceptionHandler(RuntimeException.class)
+//    public Object validExceptionHandler(Exception e,HttpServletRequest request){
+//
+//    }
 }

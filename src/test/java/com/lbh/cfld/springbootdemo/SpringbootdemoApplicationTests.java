@@ -20,7 +20,7 @@ public class SpringbootdemoApplicationTests {
 
     public void contextLoads() {
         UserInfo userInfo = userInfoMapper.findByName("小王5");
-       // System.out.println(userInfo.getUserName()+"=="+userInfo.getUserId());
+        System.out.println(userInfo.getUserName()+"=="+userInfo.getUserId());
     }
     @Test
     public void insertTest(){
