@@ -10,8 +10,10 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = SpringbootdemoApplication.class)
+import java.lang.reflect.Proxy;
+
+//@RunWith(SpringJUnit4ClassRunner.class)
+//@SpringBootTest(classes = SpringbootdemoApplication.class)
 public class SpringbootdemoApplicationTests {
 
     @Autowired
@@ -30,5 +32,25 @@ public class SpringbootdemoApplicationTests {
         userInfo.setUserEmail("54545");
         Integer insert = userInfoMapper.insert(userInfo);
     }
+    @Test
+    public void proxyTest(){
+        ORCtest orCtest = new ORCtest();
+        MyProxy myProxy = new MyProxy();
+        ORCtest bind = (ORCtest)myProxy.bind(orCtest);
+        bind.test();
 
+    }
+    @Test
+    public void proxyCGlib(){
+        ORCtest orCtest = new ORCtest();
+        ORCtest bind =(ORCtest) new MyProxyCGLIB().bind(orCtest);
+        bind.test();
+    }
+    @Test
+    public void proxyTest2(){
+        IORCtest orCtest = new ORCtest();
+        MyProxy myProxy = new MyProxy();
+        ORCtest o =(ORCtest) Proxy.newProxyInstance(orCtest.getClass().getClassLoader(), orCtest.getClass().getInterfaces(), myProxy);
+        o.test();
+    }
 }
