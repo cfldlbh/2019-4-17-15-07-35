@@ -5,7 +5,9 @@ import com.lbh.cfld.springbootdemo.model.UserInfo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.mybatis.spring.annotation.MapperScan;
 
+@MapperScan
 public interface UserInfoMapper extends BaseMapper {
     @Select("select * from user_info where user_name= #{name}")
     UserInfo findByName(@Param("name") String name);

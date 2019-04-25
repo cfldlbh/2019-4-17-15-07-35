@@ -1,5 +1,8 @@
 package com.lbh.cfld.springbootdemo;
 
+import com.alibaba.excel.ExcelReader;
+import com.alibaba.excel.metadata.Sheet;
+import com.alibaba.excel.support.ExcelTypeEnum;
 import com.lbh.cfld.springbootdemo.dao.UserInfoMapper;
 import com.lbh.cfld.springbootdemo.model.UserInfo;
 import org.junit.Test;
@@ -10,10 +13,13 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.lang.reflect.Proxy;
 
-//@RunWith(SpringJUnit4ClassRunner.class)
-//@SpringBootTest(classes = SpringbootdemoApplication.class)
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringBootTest(classes = SpringbootdemoApplication.class)
 public class SpringbootdemoApplicationTests {
 
     @Autowired
@@ -52,5 +58,12 @@ public class SpringbootdemoApplicationTests {
         MyProxy myProxy = new MyProxy();
         ORCtest o =(ORCtest) Proxy.newProxyInstance(orCtest.getClass().getClassLoader(), orCtest.getClass().getInterfaces(), myProxy);
         o.test();
+    }
+    @Test
+    public void testExcelRead() throws FileNotFoundException {
+        FileInputStream inputStream = new FileInputStream("D:\\QQfile\\问题汇总.xls");
+        ExcelListener listener = new ExcelListener();
+        ExcelReader excelReader = new ExcelReader(inputStream, ExcelTypeEnum.XLS,null, listener);
+        excelReader.read(new Sheet(1,0,ExcelModel.class));
     }
 }
