@@ -39,6 +39,8 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.LinkedList;
 import java.util.Scanner;
@@ -184,7 +186,7 @@ public void tes() throws NoSuchMethodException, ScriptException, IOException {
         div2.addElement("i").addAttribute("class","icon-lg-edit");
         Element div2div = div2.addElement("div");
         div2div.addAttribute("class","information-right").addAttribute("style","min-height: 120px;");
-        Element div2div1 = div2div.addElement("div");
+        div2div.addElement("div");
 
 //        OutputFormat format = OutputFormat.createPrettyPrint();
 //        FileWriter fileWriter = new FileWriter("c:\\myxml.xml");
@@ -192,5 +194,24 @@ public void tes() throws NoSuchMethodException, ScriptException, IOException {
 //        xmlWriter.write(doc);
 //        xmlWriter.close();
 //        fileWriter.close();
+    }
+
+    @Test
+    public void methodTest() throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
+//        Class<?> c =  LaGou1.class;
+//        Object o = c.newInstance();
+//        Method[] method = c.getMethods();
+//        Method[] declaredMethods = c.getDeclaredMethods();
+//        System.out.println("getMethods获取的方法：");
+//        for(Method m:method)
+//            System.out.println(m);
+//        System.out.println("getDeclaredMethods获取的方法：");
+//        for(Method m:declaredMethods)
+//            System.out.println(m);
+//        Class<methodClass> methodClassClass = methodClass.class;
+//        Method add = methodClassClass.getMethod("add", int.class, int.class);
+//        Object invoke = add.invoke(new methodClass(),1,4);
+//        System.out.println(invoke);
+//智联前程
     }
 }
