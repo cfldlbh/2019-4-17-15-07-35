@@ -27,6 +27,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.junit.Test;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.chrome.ChromeDriver;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -36,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class ZhiLian {
     private String gt = "c28ada23e78b932c287d12991a41f1e0";
@@ -55,14 +58,14 @@ public class ZhiLian {
         getResume("15879586926","19961023zhilian");
     }
 
-    private ResponseResult getResume(String loginName,String passWord) throws Exception {
+    private String getResume(String loginName,String passWord) throws Exception {
         try {
             approve();
         }catch (NullPointerException e){
-            ResponseResult<Object> objectResponseResult = new ResponseResult<>();
-            objectResponseResult.setSuccess(false);
-            objectResponseResult.setMessage("验证码验证步骤失败！");
-            return objectResponseResult;
+//            ResponseResult<Object> objectResponseResult = new ResponseResult<>();
+//            objectResponseResult.setSuccess(false);
+//            objectResponseResult.setMessage("验证码验证步骤失败！");
+            return "验证码验证步骤失败！";
         }
 
         HttpPost loginReuqest = new HttpPost("https://passport.zhaopin.com/login");
@@ -82,74 +85,24 @@ public class ZhiLian {
         int code = (int)jsonObject.get("code");
         if(code != 1 && code != -1){
             //登录失败提示
-            ResponseResult<Object> objectResponseResult = new ResponseResult<>();
-            objectResponseResult.setSuccess(false);
-            objectResponseResult.setMessage((String) jsonObject.get("msg"));
-            return objectResponseResult;
+//            ResponseResult<Object> objectResponseResult = new ResponseResult<>();
+//            objectResponseResult.setSuccess(false);
+//            objectResponseResult.setMessage((String) jsonObject.get("msg"));
+            return (String)jsonObject.get("msg");
         }
         //获得简历ID和简历ResumeNumber
-        new 
-//        HttpGet getDetail = new HttpGet("https://fe-api.zhaopin.com/c/i/user/detail");
-//        String detail = responseToStr(getDetail);
-//        JSONObject detailObject = JSONObject.parseObject(detail);
-//        if((int)detailObject.get("code")!=200){
-//            ResponseResult<Object> objectResponseResult = new ResponseResult<>();//获取简历必要参数失败
-//            objectResponseResult.setSuccess(false);
-//            objectResponseResult.setMessage("登录成功，但获取必要参数失败！");
-//            return objectResponseResult;
-//        }
-//        String resumeId = (String)detailObject.getJSONObject("data").getJSONObject("Resume").get("Id");//简历ID
-//        String resumeNumber = (String)detailObject.getJSONObject("data").getJSONObject("Resume").get("ResumeNumber");//简历ResumeNumber
-//        String at="";//获取简历详情必要的参数
-//        String rt="";//获取简历详情必要的参数
-//        List<Cookie> cookies = cookieStore.getCookies();
-//        for(Cookie c : cookies){
-//            if(c.getName().equals("Token")){
-//                at = c.getValue();
-//            }
-//            if(c.getName().equals("rt")){
-//                rt = c.getValue();
-//            }
-//        }
-//        if(at.length()==0 || rt.length()==0){
-//            //获取必要参数失败
-//            ResponseResult<Object> objectResponseResult = new ResponseResult<>();//获取简历必要参数失败
-//            objectResponseResult.setSuccess(false);
-//            objectResponseResult.setMessage("登录成功，但获取必要参数失败！");
-//            return objectResponseResult;
-//        }
-//        StringBuilder stringBuilder = new StringBuilder("https://fe-api.zhaopin.com/c/i/resume?");
-//        LinkedList<BasicNameValuePair> objects = new LinkedList<>();
-//        objects.add(new BasicNameValuePair("resumeId",resumeId));
-//        objects.add(new BasicNameValuePair("resumeNumber",resumeNumber));
-//        objects.add(new BasicNameValuePair("lang","1"));
-//        objects.add(new BasicNameValuePair("at",at));
-//        objects.add(new BasicNameValuePair("rt",rt));
-//        for(BasicNameValuePair b : objects){
-//            stringBuilder.append(b.getName()).append("=").append(b.getValue()).append("&");
-//        }
-//        HttpGet getResumeRequest = new HttpGet(String.valueOf(stringBuilder));
-//        String resumeJson = responseToStr(getResumeRequest);
-//        JSONObject objectDetail = null;
-//        try {
-//            objectDetail  = JSONObject.parseObject(resumeJson);
-//        }catch (Exception e){
-//            ResponseResult<Object> objectResponseResult = new ResponseResult<>();
-//            objectResponseResult.setSuccess(false);
-//            objectResponseResult.setMessage("获取简历详情失败！");
-//            return objectResponseResult;
-//        }
-//        if(objectDetail==null){
-//            ResponseResult<Object> objectResponseResult = new ResponseResult<>();
-//            objectResponseResult.setSuccess(false);
-//            objectResponseResult.setMessage("获取简历详情失败！");
-//            return objectResponseResult;
-//        }
-//        ResponseResult<JSONObject> objectResponseResult = new ResponseResult<>();
-//        objectResponseResult.setSuccess(true);
-//        objectResponseResult.setMessage("成功！");
-//        objectResponseResult.setData(objectDetail.getJSONObject("data"));
-        return objectResponseResult;
+        System.setProperty("webdriver.chrome.driver","D:/chromedriver.exe");
+        ChromeDriver driver = new ChromeDriver();
+        driver.get("https://www.zhaopin.com/");
+        List<Cookie> cookies = cookieStore.getCookies();
+        for (Cookie c : cookies){
+            if(!c.getDomain().equals("api.ddocr.com") && !c.getDomain().equals("passport.zhaopin.com")){
+                driver.manage().addCookie(new org.openqa.selenium.Cookie(c.getName(),c.getValue(),c.getDomain(),c.getPath(),null));
+            }
+        }
+        driver.get("https://i.zhaopin.com/resume");
+        String pageSource = driver.getPageSource();
+        return pageSource;
     }
 
     private void approve() throws Exception {
@@ -180,5 +133,23 @@ public class ZhiLian {
         CloseableHttpResponse execute = client.execute(request);
         HttpEntity entity = execute.getEntity();
         return EntityUtils.toString(entity);
+    }
+    private void login(String userName,String passWord) throws InterruptedException {
+        System.setProperty("webdriver.chrome.driver","D:/chromedriver.exe");
+        ChromeDriver driver = new ChromeDriver();
+        driver.manage().window().setSize(new Dimension(1024, 768));
+        driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+        driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+        driver.get("https://passport.zhaopin.com/login");
+        driver.findElementById("loginName").sendKeys(userName);
+        driver.findElementById("password").sendKeys(passWord);
+        Thread.sleep(1000);
+        driver.findElementById("submit").click();
+        Thread.sleep(2000);
+        GeetestCrawlerV2.geetestExecuter(driver);
+    }
+    @Test
+    public void testGeetest() throws InterruptedException {
+        login("1587955812215","19961023zhilian");
     }
 }

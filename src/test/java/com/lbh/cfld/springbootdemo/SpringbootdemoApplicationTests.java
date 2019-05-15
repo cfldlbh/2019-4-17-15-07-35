@@ -27,6 +27,11 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.openqa.selenium.By;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.Point;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
@@ -34,15 +39,20 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.junit4.SpringRunner;
 
 
+import javax.imageio.ImageIO;
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import java.awt.image.BufferedImage;
 import java.io.*;
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -197,21 +207,41 @@ public void tes() throws NoSuchMethodException, ScriptException, IOException {
     }
 
     @Test
-    public void methodTest() throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
-//        Class<?> c =  LaGou1.class;
-//        Object o = c.newInstance();
-//        Method[] method = c.getMethods();
-//        Method[] declaredMethods = c.getDeclaredMethods();
-//        System.out.println("getMethods获取的方法：");
-//        for(Method m:method)
-//            System.out.println(m);
-//        System.out.println("getDeclaredMethods获取的方法：");
-//        for(Method m:declaredMethods)
-//            System.out.println(m);
-//        Class<methodClass> methodClassClass = methodClass.class;
-//        Method add = methodClassClass.getMethod("add", int.class, int.class);
-//        Object invoke = add.invoke(new methodClass(),1,4);
-//        System.out.println(invoke);
-//智联前程
+    public void methodTest() throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException, IOException, InterruptedException {
+        System.setProperty("webdriver.chrome.driver","D:/chromedriver.exe");
+        ChromeDriver driver = new ChromeDriver();
+        driver.get("https://www.geetest.com/demo/slide-bind.html");
+        Thread.sleep(2000);
+        driver.findElement(By.className("btn")).click();
+        Thread.sleep(2000);
+        getImageEle(driver.findElement(By.cssSelector("canvas[class='geetest_canvas_bg geetest_absolute']")),driver);
+    }
+    public static void getImageEle(WebElement ele,ChromeDriver driver) throws IOException {
+        byte[] screenshotAs = driver.getScreenshotAs(OutputType.BYTES);
+        BufferedImage read = ImageIO.read(new ByteArrayInputStream(screenshotAs));//??
+        ImageIO.write(read,"png",new File("c:\\png\\full.png"));
+        Point point = new Point(read.getWidth(), read.getHeight());//？？
+        WebElement element = driver.findElement(By.cssSelector("div[class='geetest_panel geetest_wind']"));
+        Point htmlSize = new Point(element.getSize().width, element.getSize().height);
+        Point location = ele.getLocation();
+        int eleWidth = (int)(ele.getSize().getWidth() / (float)element.getSize().width * (float)read.getWidth());
+        int eleHeight = (int) (ele.getSize().getHeight() / (float)element.getSize().height * (float)read.getHeight());
+        BufferedImage eleScreenShot = read.getSubimage((int)(location.getX() / (float)element.getSize().width * (float)read.getWidth()), (int)(location.getY() / (float)element.getSize().height * (float)read.getHeight()), eleWidth, eleHeight);
+        System.out.println(eleScreenShot);
+        ImageIO.write(eleScreenShot,"png",new File("c:\\png\\result.png"));
+    }
+    @Test
+    public void testABC(){
+        String[] str = {"a","b","c","d","e","f"};
+        for(int i = 0;i<str.length;i++){
+            for(int o = 0;o<str.length-1-i;o++){
+                StringBuffer stringBuffer = new StringBuffer();
+                for(int t=i;t<str.length-o;t++){
+                    stringBuffer.append(str[t]);
+                    stringBuffer.append("-");
+                }
+                System.out.println(stringBuffer.toString());
+            }
+        }
     }
 }
