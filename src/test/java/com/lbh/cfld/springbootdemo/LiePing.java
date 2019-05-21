@@ -88,7 +88,7 @@ public class LiePing {
         Thread.sleep(1000);
         List<WebElement> liEl = ulEl.findElements(By.tagName("li"));//简历列表div
         Thread.sleep(1000);
-        if(liEl.size() < 0){ //没获取到当前页的简历列表，可能达到每日搜索次数限制 20
+        if(liEl.size() <= 0){ //没获取到当前页的简历列表，可能达到每日搜索次数限制 45次
             Thread.sleep(5000);
             driver.quit();
             return;

@@ -21,7 +21,6 @@ public class ExcelListener extends AnalysisEventListener<ExcelModel> {
         out.println(o.getDescription());
         out.println(analysisContext.getCurrentSheet());
         list.add(o);
-
     }
 
     @Override

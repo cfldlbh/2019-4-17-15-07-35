@@ -209,7 +209,7 @@ public class Lagou {
         entity.writeTo(outputStream);
     }
 
-    public void downLoadHtml(File file,String html) throws IOException {
+    public void downLoadHtml(File file,String html) throws IOException,RuntimeException {
         if(!file.exists()){
             file.getParentFile().mkdirs();
             file.createNewFile();

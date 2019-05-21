@@ -1,19 +1,17 @@
 package com.lbh.cfld.springbootdemo;
 
-import com.alibaba.excel.ExcelReader;
-import com.alibaba.excel.metadata.Sheet;
-import com.alibaba.excel.support.ExcelTypeEnum;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.lbh.cfld.springbootdemo.dao.UserInfoMapper;
-import com.lbh.cfld.springbootdemo.model.UserInfo;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
@@ -23,20 +21,13 @@ import org.apache.http.util.EntityUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.io.XMLWriter;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.junit4.SpringRunner;
+
 
 
 import javax.imageio.ImageIO;
@@ -46,14 +37,11 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.ArrayList;
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -244,4 +232,92 @@ public void tes() throws NoSuchMethodException, ScriptException, IOException {
             }
         }
     }
+
+
+
+        //写到配置文件中
+        private static final String KEY = "faec1b8bce619d6c0e09b141f83cc58a";
+        private static final String OUTPUT = "JSON";
+        private static final String GET_LNG_LAT_URL = "http://restapi.amap.com/v3/geocode/geo?";
+        private static final String GET_ADDR_FROM_LNG_LAT = "http://restapi.amap.com/v3/geocode/regeo?";
+        private static final String EXTENSIONS_ALL = "all";
+
+        public static Pair<BigDecimal, BigDecimal> getLngLatFromOneAddr(String address) throws IOException {
+            if (StringUtils.isBlank(address)) {
+                System.out.println("null");
+                return null;
+            }
+            Map<String, String> params = new HashMap<String, String>();
+            params.put("address", address);
+            params.put("output", OUTPUT);
+            params.put("key", KEY);
+            CloseableHttpClient build = HttpClients.custom().build();
+            HttpGet httpPost = new HttpGet(GET_LNG_LAT_URL+"address="+address+"&output="+OUTPUT+"&key="+KEY);
+            CloseableHttpResponse execute = build.execute(httpPost);
+            HttpEntity entity = execute.getEntity();
+            String s = EntityUtils.toString(entity, "UTF-8");
+            Pair<BigDecimal, BigDecimal> pair = null;
+
+            // 解析返回的xml格式的字符串result，从中拿到经纬度
+            // 调用高德API，拿到json格式的字符串结果
+            JSONObject jsonObject = JSONObject.parseObject(s);
+            // 拿到返回报文的status值，高德的该接口返回值有两个：0-请求失败，1-请求成功；
+            int status = Integer.valueOf(jsonObject.getString("status"));
+
+            if (status == 1) {
+                JSONArray jsonArray = jsonObject.getJSONArray("geocodes");
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    JSONObject json = jsonArray.getJSONObject(i);
+                    String lngLat = json.getString("location");
+                    String[] lngLatArr = lngLat.split(",");
+                    // 经度
+                    BigDecimal longitude = new BigDecimal(lngLatArr[0]);
+                    // System.out.println("经度" + longitude);
+                    // 纬度
+                    BigDecimal latitude = new BigDecimal(lngLatArr[1]);
+                    // System.out.println("纬度" + latitude);
+                    pair = new MutablePair<BigDecimal, BigDecimal>(longitude, latitude);
+                }
+
+            } else {
+                String errorMsg = jsonObject.getString("info");
+               // LOGGER.error("地址（" + address + "）" + errorMsg);
+                System.out.println("地址（" + address + "）" + errorMsg);
+            }
+
+            return pair;
+        }
+
+
+        /**
+         *
+         * @description 根据经纬度查地址
+         * @param lng：经度，lat：纬度
+         * @return 地址
+         * @author jxp
+         * @date 2017年7月12日
+         */
+        public static String getAddrFromLngLat(String lng, String lat) throws IOException {
+            Map<String, String> params = new HashMap<String, String>();
+            params.put("location", lng + "," + lat);
+            params.put("output", OUTPUT);
+            params.put("key", KEY);
+            params.put("extensions", EXTENSIONS_ALL);
+            CloseableHttpClient aDefault = HttpClients.createDefault();
+            HttpGet location = new HttpGet(GET_ADDR_FROM_LNG_LAT + "location=" + params.get("location") + "&output=" + OUTPUT + "&key=" + KEY + "&extensions=" + EXTENSIONS_ALL);
+            CloseableHttpResponse execute = aDefault.execute(location);
+            HttpEntity entity = execute.getEntity();
+            String s = EntityUtils.toString(entity);
+            String address = null;
+            return address;
+        }
+        @Test
+        public void locationTest() throws IOException {
+            String addrFromLngLat = getAddrFromLngLat("114.781805", "28.391441");//114.781805,28.391441
+        }
+        @Test
+        public void getLanTest()throws IOException{
+            Pair<BigDecimal, BigDecimal> s = getLngLatFromOneAddr("北京天安门");
+        }
+
 }

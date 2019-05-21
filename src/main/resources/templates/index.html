@@ -3,9 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+	<style type="text/css">
+		#container {width:1280px; height:700px; }  
+		.inputClasss{
+			width:50px;
+			height:20px
+		}
+	</style>
+	
 </head>
 <body>
-
-<h1 th:text="${host}">hello world</h1>
+<div style="display:flex">
+	<div id="container"></div> 
+	<div style="width:200px">
+		<input type="text" class="inputClasss" id="input1">-<input type="text" class="inputClasss" id="input2">
+		<input type="submit" value="查看" id="look1">
+		<hr/>
+		<div>
+			<input type="text" id="input3" style="width:80px"/>
+			<input type="submit" value="去指定城市" id="look2" >
+		</div>
+		<hr/>
+		<input type="submit" value="移动位置" onclick="move()"/>
+	</div>
+</div>
 </body>
+<script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.14&key=db174ebe936abf54e10ca2b55937b374&plugin=Amap.Geocoder"></script> 
+<script type="text/javascript">
+	var mapMain = new AMap.Map("container",{
+		zoom:13,
+		center:[116.205467, 39.907761],
+		viewMode:'2D'
+	});
+	    // 创建一个 Icon
+    var startIcon = new AMap.Icon({
+        // 图标尺寸
+        size: new AMap.Size(50, 121),
+        // 图标的取图地址
+        image: '20190516173944.png',
+        // 图标所用图片大小
+        imageSize: new AMap.Size(135, 40),
+        // 图标取图偏移量
+        imageOffset: new AMap.Pixel(-9, -3)
+    });
+	var position = [];
+	window.onload = function(){
+		document.getElementById("look1").onclick = function(){
+			var lng = document.getElementById("input1").value;
+			var lat = document.getElementById("input2").value;
+			position = [lng,lat];
+			mapMain.setZoomAndCenter(17,position);
+
+			marker = new AMap.Marker({
+            icon: startIcon,
+            position: position,
+
+			});
+			marker.setMap(mapMain);
+		};
+		document.getElementById("look2").onclick = function(){
+			var v = document.getElementById("input3").value;
+			if(v.length != 0){
+			var ge;
+			$scope.map.plugin(['AMap.Geocoder',], function(){
+				ge =  new AMap.Geocoder({
+                city: "010", //城市设为北京，默认：“全国”
+				})
+            });
+				ge.getLocation(v,function(status,result){
+					if (status === 'complete'&&result.geocodes.length) {
+						var lnglat = result.geocodes[0].location
+						var wz = lnglat.split(",");
+						document.getElementById("input1").value = wz[0];
+						document.getElementById("input2").value = wz[1];
+						}
+				})
+			}
+		}
+	}
+	function move(){
+		var lineArr = [];
+		for(var i =1 ;i<25;i++){
+			var l = [parseFloat(position[0])+i,parseFloat(position[1])+i];
+			lineArr.push(l);
+		}
+		marker.moveAlong(lineArr,200);
+	}
+</script>
 </html>
